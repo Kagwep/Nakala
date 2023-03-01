@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser,BaseUserManager,Permissi
 
 class CustomUserManager(BaseUserManager):
     def create_user(self,email,username, first_name,last_name,phone_number,password=None):
+        #fields verification
         if not email:
             raise ValueError('please enter a valid email')
         if not username:
@@ -28,6 +29,7 @@ class CustomUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+    
     def create_superuser(self,email,username, first_name,last_name,phone_number,password=None):
         user = self.create_user(
             email = self.normalize_email(email),
@@ -45,7 +47,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-#custom user
+#custom user creation
 class User(AbstractBaseUser,PermissionsMixin):
     email = models.EmailField(verbose_name='email',unique=True)
     username = models.CharField(max_length=200, verbose_name= 'username',unique=True)
@@ -57,9 +59,13 @@ class User(AbstractBaseUser,PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser =models.BooleanField(default=False)
 
+    #field that will be used to log in
     USERNAME_FIELD = 'username'
+    
+    # all required fields from user
     REQUIRED_FIELDS = ['email','phone_number','first_name','last_name']
     
+    #oyr custom user manager
     objects = CustomUserManager()
 
     def __str__(self):

@@ -17,37 +17,36 @@ class UserList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        #use our serializer class to serialize data from request
         serializer = UserSerializer(data=request.data)
+        #if valid
         if serializer.is_valid():
+            #save object
             serializer.save()
+            #return the data 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
+        #if not return status and the reason
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetail(APIView):
 
     # Retrieve, update or delete a user instance
 
+    #get user
     def get_object(self, pk):
         try:
             return User.objects.get(id=pk)
         except User.DoesNotExist:
             raise Http404
-
+        
+     #get user by id
     def get(self, request, pk):
         user = User.objects.get(id=pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-    # def put(self, request, pk):
-    #     user = User.objects.get(id=pk)
-    #     serializer = UserSerializer(user, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     print(serializer.errors)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+ 
+    #update the fields of requested object id
     def put(self, request, pk):
         user = User.objects.get(id=pk)
 
@@ -63,13 +62,17 @@ class UserDetail(APIView):
         if 'phone_number' in request.data:
             user.phone_number = request.data['phone_number']
 
+        #save the update
         user.save()
 
+         #serialize the user
         serializer = UserSerializer(user)
-
+         # return the updated data
         return Response(serializer.data)
 
+    #get the user by id
     def delete(self, request, pk):
         user = User.objects.get(id=pk)
+        #delete the user
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
