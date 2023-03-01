@@ -5,13 +5,15 @@ from rest_framework import status
 from users.models import User
 from .serializers import UserSerializer
 
+#get all users / post new user
 class UserList(APIView):
-    """
-    List all users or create a new user
-    """
+
     def get(self, request):
+        #get all users from model
         users = User.objects.all()
+        #serialize our user objects
         serializer = UserSerializer(users, many=True)
+        #return serialized data
         return Response(serializer.data)
 
     def post(self, request):
@@ -23,9 +25,9 @@ class UserList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetail(APIView):
-    """
-    Retrieve, update or delete a user instance
-    """
+
+    # Retrieve, update or delete a user instance
+
     def get_object(self, pk):
         try:
             return User.objects.get(id=pk)
